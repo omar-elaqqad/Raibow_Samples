@@ -17,11 +17,10 @@
     <style>
         .profile-popup {
             display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
+            position: absolute;
+            top: 50px;
+            left: 30px;
+            background-color: #fff;
             padding: 20px;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -29,74 +28,737 @@
             z-index: 9999;
         }
 
-        .profile-popup img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
+        .profile-popup ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .profile-popup ul li {
             margin-bottom: 10px;
         }
 
-        .profile-popup p {
-            margin: 5px 0;
+        .profile-popup ul li:last-child {
+            margin-bottom: 0;
         }
 
-        .body {
-            background-color: #333;
+        .profile-popup ul li a {
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .profile-popup ul li a:hover {
+            text-decoration: underline;
+        }
+
+
+        .option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            white-space: nowrap;
+            /* Prevents text wrapping */
+        }
+
+        .option:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .option i {
+            margin-right: 10px;
+        }
+
+        .presence-text {
+            color: #333;
+            /* Default text color */
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .text-success {
+            color: green;
+        }
+
+        .text-warning {
+            color: yellow;
+        }
+
+        .text-danger {
+            color: red;
+        }
+
+        .text-secondary {
+            color: #666;
+        }
+
+        .option i {
+            margin-right: 10px;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 10px;
+            background-color: #0056b3;
+            color: #fff;
+            padding: 20px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            z-index: 1;
+            /* Ensure the sidebar is above other elements */
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-icon {
+            margin-bottom: 18px;
+            cursor: pointer;
+            position: relative;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .sidebar-icon:hover {
+            background-color: rgba(203, 210, 217, 0.5);
+            border-radius: 5px;
+        }
+
+        .sidebar-icon:hover .tooltip {
+            display: block;
+        }
+
+        .tooltip {
+            display: none;
+            position: absolute;
+            right: calc(100% + 10px);
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #000;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            z-index: 3;
+            /* Increase the z-index to ensure it's above other elements */
+        }
+
+        .search-recent {
+            width: 180px;
+            background-color: #fff;
+            padding: 15px;
+            margin: 3px auto 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            top: 50%;
+            left: 6px;
+            transform: translateY(-50%);
+            color: #888;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .search-form {
+            position: relative;
+            margin-bottom: 8px;
+            width: 100%;
+        }
+
+        .search-form input[type="text"] {
+            padding: 10px 30px 8px 40px;
+            background-color: #f2f2f2;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            width: calc(100% - 65px);
+        }
+
+        .recent-conversations {
+            width: 180px;
+            padding: 15px;
+            margin: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .dropdown-header {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .dropdown-header span {
+            margin-left: 5px;
+            font-size: 14px;
+        }
+
+        .dropdown-header i {
+            margin-right: 5px;
+            transition: transform 0.3s;
+        }
+
+        .flipper-flesh {
+            display: none;
+        }
+
+        .recent-conversations.expanded .flipper-flesh {
+            display: block;
+        }
+
+        .recent-conversations.expanded .dropdown-header i {
+            transform: rotate(90deg);
+        }
+
+        .search-results {
+            background-color: #fff;
+            color: #000;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        #presenceOptions {
+            position: absolute;
+            top: 0px;
+            left: 150px;
+            display: none;
+        }
+
+        #presenceOptions span {
+            display: block;
+        }
+
+        .profile2-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 500px;
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            overflow: hidden;
+        }
+
+        .profile-info {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             text-align: center;
-            color: #eee
         }
 
-        h1 {
-            color: #eee;
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
         }
 
-        a {
-            color: #7f5af0;
-            font-weight: 900;
+        .profile-header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-header-left i {
+            margin-right: 10px;
+        }
+
+        .profile-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-body img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+
+        .profile-body p {
+            margin-bottom: 10px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .profile-header-right button {
+            margin-left: 10px;
+        }
+
+        .detail-contact {
+            width: 180px;
+            background-color: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            flex-shrink: 0;
+            display: none;
+        }
+
+        .conversation-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+
+        .contact-avatar {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .contact-detail-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+        }
+
+        .contact-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .favorite-button,
+        .invite-button {
+            margin: 0 5px;
+            padding: 8px 20px;
+            border: none;
+            background-color: #007bff;
+            /* Blue color */
+            color: #fff;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .contact-name {
+            margin-top: 20px;
+        }
+
+        .contact-information {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .contact-info-item {
+            margin-bottom: 10px;
+        }
+
+        .info-label {
+            font-weight: bold;
+        }
+
+        .remove-from-network-button {
+            margin-top: 20px;
+            padding: 8px 20px;
+            border: none;
+            background-color: #f8d7da;
+            /* Light red color */
+            color: #721c24;
+            /* Dark red color */
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .remove-from-network-button:hover {
+            background-color: #dc3545;
+            /* Red color on hover */
+            color: #fff;
+            /* White color on hover */
+        }
+
+
+        .message-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            margin-bottom: 10px;
+        }
+
+        .sent-message {
+            align-self: flex-end;
+            background-color: #DCF8C6;
+            border-radius: 10px;
+            padding: 5px 10px;
+        }
+
+        .received-message {
+            align-self: flex-start;
+            background-color: #E5E5EA;
+            border-radius: 10px;
+            padding: 5px 10px;
+        }
+
+        .main {
+            flex: 1;
+            padding: 20px;
+            background-color: #f2f2f2;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: auto;
+        }
+
+        .chat-box {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+
+        .input-container {
+            position: absolute;
+            bottom: 10px;
+            width: 99%;
+            display: flex;
+            align-items: center;
+        }
+
+        .message-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            width: 91%;
+            margin-right: 4px;
+        }
+
+        .send-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            width: 38px;
+            height: 38px;
+            cursor: pointer;
+        }
+
+        .chat-box,
+        .input-container {
+            display: none;
+        }
+
+        .notification-center {
+            position: absolute;
+            top: 30px;
+            right: -320px;
+            width: 400px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 10000;
+            padding: 10px;
+            align-items: center;
+        }
+
+        .notification-button {
+            display: flex;
+            position: relative;
+            cursor: pointer;
+            margin-bottom: 7px;
+            z-index: 10001;
+            margin-left: 150px;
+        }
+
+        .notification-counter {
+            position: absolute;
+            top: -8px;
+            right: 8px;
+            color: red;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 4px;
+        }
+
+        .notification-title {
+            margin-top: 3px;
+            font-size: 17px;
+            color: #333;
+        }
+
+        .invitation-item {
+            list-style: none;
+            padding: 3px 0;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+        }
+
+        .invitation-avatar {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .invitation-text {
+            flex-grow: 1;
+        }
+
+        .invitation-text span {
+            display: block;
+        }
+
+        .accept-icon,
+        .decline-icon {
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 10px;
+            color: #28a745;
+        }
+
+        .decline-icon {
+            color: #dc3545;
         }
     </style>
 
 <body>
-    <!-- Card for displaying account information -->
-    <div class="card">
-        <div class="profile-icon" id="profileIcon">
-            <i class="fas fa-user-circle fa-2x"></i>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-icon" title="Profile" id="profileIcon">
+            <div class="profile-icon" id="profileAvatar">
+                <i class="fas fa-user-circle fa-2x"></i>
+            </div>
+            <div class="tooltip">Profile</div>
         </div>
-        <div class="card-body">
-            <div id="profilePopup" class="profile-popup">
-                <div class="profile-info">
-                    <img id="popupAvatar" src="default_avatar.png" alt="User Avatar">
-                    <p>Usename: <span id="username"></span></p>
-                    <p>Email: <span id="email"></span></p>
-                    <p>Job: <span id="jobTitle"></span></p>
+
+        <div class="sidebar-icon" title="Channels">
+            <i class="fas fa-stream fa-lg"></i>
+            <div class="tooltip">Channels</div>
+        </div>
+
+        <div class="sidebar-icon" title="Bubbles">
+            <i class="fas fa-comments fa-lg"></i>
+            <div class="tooltip">Bubbles</div>
+        </div>
+
+        <div class="sidebar-icon" title="Contacts">
+            <i class="fas fa-address-book fa-lg"></i>
+            <div class="tooltip">Contacts</div>
+        </div>
+
+        <div class="sidebar-icon" title="Calls">
+            <i class="fas fa-phone-alt fa-lg"></i>
+            <div class="tooltip">Calls</div>
+        </div>
+
+        <div class="sidebar-icon" title="Files">
+            <i class="fas fa-file-alt fa-lg"></i>
+            <div class="tooltip">Files</div>
+        </div>
+
+        <div class="sidebar-icon" title="Tasks">
+            <i class="fas fa-tasks fa-lg"></i>
+            <div class="tooltip">Tasks</div>
+        </div>
+
+    </div>
+
+    <!-- profile options-->
+    <div id="profileOptionsPopup" class="profile-popup">
+
+        <div class="option" id="presence">
+            <i class="fas fa-circle" id="presenceIcon"></i>
+            <span id="presenceValue">Online</span>
+        </div>
+        <div id="presenceOptions" class="profile-popup">
+            <ul>
+                <li class="option">
+                    <i class="fas fa-circle text-success"></i>
+                    <span class="presence-text">Online</span>
+                </li>
+                <li class="option">
+                    <i class="fas fa-clock text-warning"></i>
+                    <span class="presence-text">Away</span>
+                </li>
+                <li class="option">
+                    <i class="fas fa-ban text-danger"></i>
+                    <span class="presence-text">Do Not Disturb</span>
+                </li>
+                <li class="option">
+                    <i class="fas fa-eye-slash text-secondary"></i>
+                    <span class="presence-text">Invisible</span>
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="option" id="myProfileOption">
+            <i class="fas fa-user-circle"></i>
+            <span>My Profile</span>
+        </div>
+        <div class="option">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </div>
+        <div class="option" id="signoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </div>
+
+    </div>
+
+    <!-- Display Connected User -->
+    <div class="profile2-popup" id="profilePopup">
+        <div class="profile-info">
+            <div class="profile-header">
+                <div class="profile-header-left">
+                    <i class="fas fa-user-circle fa-2x"></i>
+                    <span>My Profile</span>
                 </div>
-                <button id="signoutBtn">Log Out</button>
+            </div>
+            <div class="profile-body">
+                <img id="popupAvatar" src="" alt="User Avatar">
+                <p>Email: <span id="email"></span></p>
+                <p>Name: <span id="username"></span></p>
+            </div>
+
+            <div class="profile-header-right">
+                <button id="editProfileBtn">Edit</button>
+                <button id="closeProfileBtn">Close</button>
             </div>
         </div>
     </div>
-
-
-    <!-- Search form -->
-    <div class="search-form">
-        <label for="searchInput">Search:</label>
-        <input type="text" id="searchInput" placeholder="Enter keyword...">
-        <button id="searchBtn">Search</button>
     </div>
+    <section class="search-recent">
+        <!-- Notification button for invitations -->
+        <div class="notification-button" id="notificationBtn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-counter" id="notificationCounter"></span>
+        </div>
 
-    <div id="searchResults"></div>
+        <!-- Notification Center -->
+        <div id="notificationList" class="notification-center" style="display: none;">
+            <div class="notification-card">
+                <h3 class="notification-title">Notification Center</h3>
+                <ul id="invitationList"></ul>
+            </div>
+        </div>
 
-    <!-- Chat box and send button/icon -->
-<div id="chatBox" style="display: none;">
-    <textarea id="messageInput" placeholder="Type your message here..."></textarea>
-    <button id="sendButton">Send</button>
-</div>
 
-    <button id="createBroupBtn">groups</button>
-    <div id="divGroup"></div>
+
+        <!-- Search form with search icon inside -->
+        <div class="search-form">
+            <input type="text" id="searchInput" placeholder="Search...">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+        <!-- Recent conversations section -->
+        <div class="recent-conversations">
+            <div class="dropdown-header" id="recentConversationsHeader">
+                <i class="fas fa-chevron-right"></i>
+                <span id="toggleRecentBtn" class="toggle-button">Recent conversations</span>
+            </div>
+            <div class="flipper-flesh" id="recentConversationsList">
+            </div>
+
+        </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="main" id="mainContent">
+        <!-- Chat Box -->
+        <div class="chat-box" id="chatBox">
+            <!-- Message Container -->
+            <div class="message-container">
+                <!-- Example Message: Sent Message -->
+                <div class="message sent-message" id="sentMessage"></div>
+
+                <!-- Example Message: Received Message -->
+                <div class="message received-message" id="receivedMessage"></div>
+            </div>
+        </div>
+
+        <!-- Message Input Field and Send Button -->
+        <div class="input-container">
+            <input type="text" id="messageInput" class="message-input" placeholder="Type your message here...">
+            <button id="sendMessageBtn" class="send-button"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+    <!-- Detail Contact -->
+    <div class="detail-contact" id="detailContact">
+        <!-- Avatar -->
+        <img src="" alt="" class="contact-detail-avatar" id="contactAvatar">
+
+        <!-- Buttons: Favorite and Invite -->
+        <div class="contact-buttons">
+            <button class="favorite-button">Favorite</button>
+            <button class="invite-button">Invite</button>
+        </div>
+
+        <!-- Full Name -->
+        <h2 class="contact-name" id="contactName"></h2>
+
+        <!-- Contact Information -->
+        <div class="contact-information">
+            <h3>Contact information </h3>
+            <!-- Email -->
+            <div class="contact-info-item">
+                <span class="info-label">Email:</span>
+                <span class="info-value" id="contactEmail"></span>
+            </div>
+
+            <!-- Add other contact information items here -->
+
+            <!-- Remove from Network button -->
+            <button class="remove-from-network-button">Remove from Network</button>
+        </div>
+    </div>
+    <!--<button id="createBroupBtn">groups</button>
+    <div id="divGroup"></div> -->
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-</body>
+    <script>
+        document.getElementById("recentConversationsHeader").addEventListener("click", function () {
+            this.parentElement.classList.toggle("expanded");
+        });
 
+    </script>
+</body>
 
 </html>
